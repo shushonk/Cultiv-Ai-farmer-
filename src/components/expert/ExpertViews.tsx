@@ -266,7 +266,7 @@ export const ExpertViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
   // ----------------------------------------------------
   // SUB-VIEW: VERIFICATION QUEUE & CASE REVIEW
   // ----------------------------------------------------
-  if (subPath === 'queue') {
+  if (subPath === 'queue' || subPath === 'verification' || subPath === 'cases') {
     return (
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
@@ -550,7 +550,241 @@ export const ExpertViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
   }
 
   // ----------------------------------------------------
-  // SUB-VIEW: EXPERT SETTINGS
+  // SUB-VIEW: EXPERT SETTINGS & PROFILE
+  // ----------------------------------------------------
+  if (subPath === 'settings' || subPath === 'profile') {
+    return <ExpertSettingsView user={user} onNavigate={onNavigate} />;
+  }
+
+  // ----------------------------------------------------
+  // SUB-VIEW: EPIDEMIOLOGICAL INVESTIGATIONS
+  // ----------------------------------------------------
+  if (subPath === 'investigations') {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-rose-400">
+              <Microscope className="w-4 h-4" />
+              <span>ICAR Epidemiological Field Investigations Desk</span>
+            </div>
+            <h1 className="text-2xl font-bold text-white mt-1">Active Outbreak Investigations</h1>
+            <p className="text-xs text-slate-400">
+              Deep diagnostic investigations, field sample analysis, and pathogen transmission tracking
+            </p>
+          </div>
+          <button
+            onClick={() => onNavigate('/expert/verification')}
+            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5"
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Open Verification Queue</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-rose-400 uppercase">INV-2026-089</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300">HIGH RISK</span>
+            </div>
+            <h3 className="text-sm font-bold text-white">Tomato Leaf Curl New Delhi Virus (ToLCNDV) Cluster</h3>
+            <p className="text-xs text-slate-400">Location: Kolar East & Bangarapet • Vector: Bemisia tabaci (Whitefly)</p>
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1">
+              <div><strong>Affected Parcels:</strong> 14 Registered Fields</div>
+              <div><strong>Primary Host:</strong> Tomato (Abhinav Hybrid)</div>
+              <div><strong>Recommended Intervention:</strong> Imidacloprid 17.8 SL @ 0.5ml/L + Yellow Sticky Traps @ 25/acre</div>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-400 uppercase">INV-2026-074</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">MODERATE</span>
+            </div>
+            <h3 className="text-sm font-bold text-white">Alternaria Solani Early Blight Dew Escalation</h3>
+            <p className="text-xs text-slate-400">Location: Chintamani & Malur • Trigger: Relative Humidity &gt;85%</p>
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1">
+              <div><strong>Affected Parcels:</strong> 8 Registered Fields</div>
+              <div><strong>Primary Host:</strong> Potato & Chilli</div>
+              <div><strong>Recommended Intervention:</strong> Mancozeb 75 WP @ 2g/L or Azoxystrobin 23 SC @ 1ml/L</div>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-400 uppercase">INV-2026-052</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">CONTAINED</span>
+            </div>
+            <h3 className="text-sm font-bold text-white">Paddy Bacterial Leaf Blight Spot Survey</h3>
+            <p className="text-xs text-slate-400">Location: Gangavathi Irrigation Belt • Pathogen: Xanthomonas oryzae</p>
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1">
+              <div><strong>Affected Parcels:</strong> 22 Registered Fields</div>
+              <div><strong>Primary Host:</strong> Paddy (Sona Masuri)</div>
+              <div><strong>Recommended Intervention:</strong> Streptocycline @ 0.1g/L + Copper Oxychloride @ 2.5g/L</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // SUB-VIEW: LAB SAMPLES WORKFLOW
+  // ----------------------------------------------------
+  if (subPath === 'samples') {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="border-b border-slate-800 pb-4">
+          <h1 className="text-2xl font-bold text-white">ICAR Reference Laboratory Samples</h1>
+          <p className="text-xs text-slate-400">
+            Foliar & soil sample physical tracking, PCR sequencing, and molecular pathology verification
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-amber-400">SPL-2026-901</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">PCR SEQUENCING</span>
+              </div>
+              <h3 className="text-base font-bold text-white">Tomato Leaf Specimen — Viral PCR Assay</h3>
+              <p className="text-xs text-slate-400">Farmer: Ramesh Gowda • District: Kolar • Sample ID: LAB-KLR-882</p>
+            </div>
+            <div className="text-right text-xs">
+              <div className="text-emerald-400 font-bold">DNA Extraction Complete</div>
+              <div className="text-slate-500 text-[11px]">Submitted: 2026-09-21</div>
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs font-bold text-amber-400">SPL-2026-884</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">VERIFIED</span>
+              </div>
+              <h3 className="text-base font-bold text-white">Chilli Dieback Culture Plate & Bioassay</h3>
+              <p className="text-xs text-slate-400">Farmer: Venkatesh M. • District: Chintamani • Sample ID: LAB-CHIN-104</p>
+            </div>
+            <div className="text-right text-xs">
+              <div className="text-emerald-400 font-bold">Colletotrichum capsici Confirmed</div>
+              <div className="text-slate-500 text-[11px]">Verified: 2026-09-22</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // SUB-VIEW: EXPERT MESSAGES & CONSULTATIONS
+  // ----------------------------------------------------
+  if (subPath === 'messages' || subPath === 'consultations') {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+        <div className="border-b border-slate-800 pb-4">
+          <h1 className="text-2xl font-bold text-white">Expert Consultation Desk</h1>
+          <p className="text-xs text-slate-400">Direct communication with farmers and field extension officers</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl bg-slate-900 border border-amber-500/50 cursor-pointer">
+              <div className="flex items-center justify-between text-xs font-bold text-white">
+                <span>Ramesh Gowda (Farmer)</span>
+                <span className="text-[10px] text-amber-400">10:24 AM</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 truncate">Doctor, should I spray Mancozeb today given evening rain forecast?</p>
+            </div>
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 cursor-pointer hover:border-slate-700">
+              <div className="flex items-center justify-between text-xs font-bold text-white">
+                <span>Officer Suresh Kumar (DAO)</span>
+                <span className="text-[10px] text-slate-500">Yesterday</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 truncate">Requested technical advisory note for Bangarapet yellow mosaic outbreak.</p>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col h-[500px]">
+            <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-white">Conversation with Ramesh Gowda</h3>
+                <p className="text-[11px] text-slate-400">Kolar District • Case: Tomato Early Blight (CASE-8821)</p>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">ACTIVE</span>
+            </div>
+
+            <div className="flex-1 overflow-y-auto py-4 space-y-3">
+              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 max-w-lg text-xs space-y-1">
+                <div className="font-bold text-emerald-400">Ramesh Gowda</div>
+                <p className="text-slate-300">Doctor, should I spray Mancozeb today given evening rain forecast?</p>
+                <div className="text-[10px] text-slate-500 text-right">10:24 AM</div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30 max-w-lg ml-auto text-xs space-y-1">
+                <div className="font-bold text-amber-400">Dr. Sunita Rao (You)</div>
+                <p className="text-slate-200">Delay chemical spray until rain passes to prevent washing off. If dew duration is high overnight, apply early tomorrow morning with a sticker adjuvant.</p>
+                <div className="text-[10px] text-amber-300/60 text-right">10:28 AM</div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800 flex gap-2">
+              <input
+                type="text"
+                placeholder="Type advisory response..."
+                className="flex-1 px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs"
+              />
+              <button className="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs flex items-center gap-1.5">
+                <Send className="w-3.5 h-3.5" />
+                <span>Send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // SUB-VIEW: AGRONOMY COPILOT ASSISTANT
+  // ----------------------------------------------------
+  if (subPath === 'assistant' || subPath === 'copilot') {
+    return (
+      <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
+        <div className="border-b border-slate-800 pb-4">
+          <div className="flex items-center gap-2 text-xs font-semibold text-amber-400">
+            <Sparkles className="w-4 h-4" />
+            <span>Pathology AI Copilot</span>
+          </div>
+          <h1 className="text-2xl font-bold text-white mt-1">Plant Pathology AI Assistant</h1>
+          <p className="text-xs text-slate-400">Synthesize CIBRC chemical dosages, epidemiology risk models, and case differential diagnoses</p>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 leading-relaxed space-y-2">
+            <p className="font-bold text-amber-400">Hello Dr. {user.name}, how can I assist your diagnostic analysis today?</p>
+            <p className="text-slate-400">You can query CIBRC approved fungicides, pathogen incubation periods, or request multi-factor disease risk synthesis for any district.</p>
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="e.g. Compare Mancozeb vs Azoxystrobin pre-harvest intervals for tomato early blight..."
+              className="flex-1 px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-amber-400"
+            />
+            <button className="px-5 py-3 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              <span>Query Copilot</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // SUB-VIEW: EXPERT PROFILE & SETTINGS WORKSPACE
   // ----------------------------------------------------
   if (subPath === 'settings' || subPath === 'profile') {
     return <ExpertSettingsView user={user} onNavigate={onNavigate} />;

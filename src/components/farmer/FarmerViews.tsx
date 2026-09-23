@@ -7,6 +7,7 @@ import { StatusBadge, SeverityBadge, RiskBadge } from '../common/StatusBadge';
 import { RiskIndicator } from '../common/RiskIndicator';
 import { CaseTimeline } from '../common/CaseTimeline';
 import { FarmerSettingsView } from './FarmerSettingsView';
+import { useI18n } from '../../i18n';
 import {
   Sprout,
   Camera,
@@ -39,6 +40,7 @@ interface Props {
 }
 
 export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
+  const { t } = useI18n();
   const fields = StorageService.getFields(user.id);
   const cases = StorageService.getCases({ farmerId: user.id });
   const alerts = StorageService.getAlerts('FARMER', user.id);
@@ -1224,15 +1226,15 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
 
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Diagnostic Cases & Advisories</h1>
-            <p className="text-xs text-slate-400">Track AI diagnostics, expert confirmations, and follow-up records</p>
+            <h1 className="text-2xl font-bold text-white">{t('farmer.casesTitle')}</h1>
+            <p className="text-xs text-slate-400">{t('farmer.casesSubtitle')}</p>
           </div>
           <button
             onClick={() => onNavigate('/farmer/scan')}
             className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5"
           >
             <Camera className="w-4 h-4" />
-            <span>New Scan</span>
+            <span>{t('farmer.newScan')}</span>
           </button>
         </div>
 
@@ -1256,7 +1258,7 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
                     <StatusBadge status={c.status} />
                   </div>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    {c.crop} • {c.fieldName} • Logged: {new Date(c.createdAt).toLocaleDateString()}
+                    {c.crop} • {c.fieldName} • {t('farmer.logged')}: {new Date(c.createdAt).toLocaleDateString()}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <RiskBadge risk={c.riskAssessment.overallRisk} showScore={c.riskAssessment.score} />
@@ -1267,12 +1269,12 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
 
               <div className="flex items-center gap-3 self-end md:self-center">
                 {c.expertReview ? (
-                  <span className="text-xs text-amber-300 font-semibold">✓ Verified by Expert</span>
+                  <span className="text-xs text-amber-300 font-semibold">✓ {t('farmer.expertVerified')}</span>
                 ) : (
-                  <span className="text-xs text-slate-400">AI Diagnostic Preliminary</span>
+                  <span className="text-xs text-slate-400">{t('farmer.aiPreliminary')}</span>
                 )}
                 <button className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-white">
-                  Inspect Case →
+                  {t('farmer.inspectCase')} →
                 </button>
               </div>
             </div>

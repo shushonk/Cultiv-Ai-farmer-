@@ -39,7 +39,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof window !== 'undefined') {
       localStorage.setItem('cultivai_language_v2', lang);
       document.documentElement.lang = lang;
-      // also notify storage service if present
+      // sync session storage
       try {
         const storedUser = localStorage.getItem('cultivai_session_v2');
         if (storedUser) {
@@ -50,6 +50,18 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch {
         // ignore
       }
+
+      // Synchronize with user_settings in the backend database
+      fetch('/api/settings/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('cultivai_token_v2') || ''}`,
+        },
+        body: JSON.stringify({ language: lang }),
+      }).catch((err) => {
+        console.warn('Backend language sync warning:', err);
+      });
     }
   };
 

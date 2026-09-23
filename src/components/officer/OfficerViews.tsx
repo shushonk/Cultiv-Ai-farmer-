@@ -1005,45 +1005,7 @@ export const OfficerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => 
   }
 
   // ----------------------------------------------------
-  // SUB-VIEW: OFFICER PROFILE (`/officer/profile`)
-  // ----------------------------------------------------
-  if (subPath === 'profile') {
-    return (
-      <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Surveillance Officer Profile</h1>
-          <p className="text-xs text-slate-400">District Agricultural Extension & Surveillance Credentials</p>
-        </div>
-
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-          <div className="flex items-center gap-4 border-b border-slate-800 pb-4">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center font-bold text-xl text-white">
-              {user.name.charAt(0)}
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">{user.name}</h2>
-              <span className="text-xs text-blue-400 font-semibold">{user.organization || 'Department of Agriculture, Karnataka'}</span>
-              <p className="text-xs text-slate-400">{user.email} • {user.phone}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[11px]">Jurisdiction</span>
-              <span className="font-semibold text-white">Kolar & Chikkaballapur</span>
-            </div>
-            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-              <span className="text-slate-400 block text-[11px]">Role Permission</span>
-              <span className="font-semibold text-white">District Extension Surveillance</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ----------------------------------------------------
-  // SUB-VIEW: SETTINGS / PROFILE
+  // SUB-VIEW: OFFICER PROFILE & SETTINGS (`/officer/profile` or `/officer/settings`)
   // ----------------------------------------------------
   if (subPath === 'settings' || subPath === 'profile') {
     return <OfficerSettingsView user={user} onNavigate={onNavigate} />;

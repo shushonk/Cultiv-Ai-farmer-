@@ -89,6 +89,10 @@ export interface FarmerPreferences {
 
 export interface ExpertPreferences {
   userId: string;
+  qualification?: string;
+  organization?: string;
+  specialization?: string;
+  bio?: string;
   defaultCaseView: 'queue' | 'investigations' | 'cases';
   defaultSort: 'risk' | 'date' | 'confidence' | 'priority';
   reviewPreferences: {

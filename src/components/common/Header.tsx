@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Language, AlertItem } from '../../types';
 import { StorageService } from '../../services/storage';
 import { useI18n } from '../../i18n';
+import { LanguageSelector } from './LanguageSelector';
 import {
   Bell,
   Globe,
@@ -24,16 +25,10 @@ interface Props {
 }
 
 export const Header: React.FC<Props> = ({ user, onNavigate, onToggleSidebar, currentPath }) => {
-  const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [alertMenuOpen, setAlertMenuOpen] = useState(false);
-  const { language: currentLang, setLanguage, t } = useI18n();
+  const { language: currentLang, t } = useI18n();
   const alerts = user ? StorageService.getAlerts(user.role, user.id) : [];
   const unreadCount = alerts.filter((a) => !a.read).length;
-
-  const handleLangSelect = (lang: Language) => {
-    setLanguage(lang);
-    setLangMenuOpen(false);
-  };
 
   const handleLogout = () => {
     if (user) {
@@ -136,55 +131,7 @@ export const Header: React.FC<Props> = ({ user, onNavigate, onToggleSidebar, cur
         {/* Right tools (Language, Notifications, Profile / Portal Access) */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Multilingual Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setLangMenuOpen(!langMenuOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-colors"
-            >
-              <Globe className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="uppercase">{currentLang}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </button>
-
-            {langMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1.5 z-50 animate-fadeIn">
-                <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400 border-b border-slate-800 flex items-center justify-between">
-                  <span>{t('header.language')}</span>
-                  <Globe className="w-3 h-3 text-emerald-400" />
-                </div>
-                <button
-                  onClick={() => handleLangSelect('en')}
-                  className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-800 transition-colors ${currentLang === 'en' ? 'text-emerald-400 font-bold bg-emerald-500/10' : 'text-slate-300'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🇬🇧</span>
-                    <span>English</span>
-                  </div>
-                  {currentLang === 'en' && <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />}
-                </button>
-                <button
-                  onClick={() => handleLangSelect('kn')}
-                  className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-800 transition-colors ${currentLang === 'kn' ? 'text-emerald-400 font-bold bg-emerald-500/10' : 'text-slate-300'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🇮🇳</span>
-                    <span>ಕನ್ನಡ (Kannada)</span>
-                  </div>
-                  {currentLang === 'kn' && <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />}
-                </button>
-                <button
-                  onClick={() => handleLangSelect('hi')}
-                  className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-slate-800 transition-colors ${currentLang === 'hi' ? 'text-emerald-400 font-bold bg-emerald-500/10' : 'text-slate-300'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">🇮🇳</span>
-                    <span>हिन्दी (Hindi)</span>
-                  </div>
-                  {currentLang === 'hi' && <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />}
-                </button>
-              </div>
-            )}
-          </div>
+          <LanguageSelector />
 
           {/* Notifications if logged in */}
           {user && (

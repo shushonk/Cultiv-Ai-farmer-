@@ -1,3 +1,4 @@
+import { Language } from '../types';
 import {
   UserSettings,
   NotificationPreferences,
@@ -166,7 +167,7 @@ export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   },
 };
 
-export const getDefaultUserSettings = (userId: string, lang = 'en' as const): UserSettings => ({
+export const getDefaultUserSettings = (userId: string, lang: Language = 'en'): UserSettings => ({
   userId,
   language: lang,
   theme: 'dark',

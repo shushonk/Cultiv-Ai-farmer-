@@ -123,7 +123,14 @@
     "askDoctor": "Ask specialist regarding spray dosage, timing, or symptoms...",
     "copilotTitle": "CultivAI Agronomy Assistant",
     "copilotSubtitle": "Real-time advisory grounded in your field crops, local weather sensors, and certified IPM ontologies",
-    "askCopilot": "Ask about pest symptoms, spray intervals, fertilizer balancing..."
+    "askCopilot": "Ask about pest symptoms, spray intervals, fertilizer balancing...",
+    "casesTitle": "Diagnostic Cases & Advisories",
+    "casesSubtitle": "Track AI diagnostics, expert confirmations, and follow-up records",
+    "newScan": "New Scan",
+    "logged": "Logged",
+    "expertVerified": "Verified by Expert",
+    "aiPreliminary": "AI Diagnostic Preliminary",
+    "inspectCase": "Inspect Case"
   },
   "expert": {
     "title": "Plant Pathology Diagnostic Desk",

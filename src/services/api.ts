@@ -398,7 +398,7 @@ class ApiService {
     return this.request('/api/admin/sessions');
   }
 
-  public async revokeSession(sessionId: string): Promise<{ success: boolean; message: string }> {
+  public async revokeAdminSession(sessionId: string): Promise<{ success: boolean; message: string }> {
     return this.request('/api/admin/sessions/revoke', {
       method: 'POST',
       body: JSON.stringify({ sessionId }),

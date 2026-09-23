@@ -76,6 +76,7 @@ export const AdminViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
       return <ReportsAnalyticsView currentUser={user} />;
 
     case 'settings':
+    case 'profile':
       return <SystemSettingsView currentUser={user} />;
 
     case 'dashboard':

@@ -1579,6 +1579,94 @@ app.patch('/api/settings/privacy', (req: Request, res: Response) => {
 });
 
 // 4. ROLE PREFERENCES (Farmer, Expert, Officer)
+app.patch('/api/farmer/settings/profile', (req: Request, res: Response) => {
+  const user = getRequestUser(req);
+  if (!user) return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+
+  const body = req.body || {};
+
+  // Validation
+  if (body.name !== undefined && (!body.name || typeof body.name !== 'string' || body.name.trim().length === 0)) {
+    return res.status(400).json({ success: false, error: 'INVALID_NAME', message: 'Full name cannot be empty.' });
+  }
+  if (body.email !== undefined && body.email && !body.email.includes('@')) {
+    return res.status(400).json({ success: false, error: 'INVALID_EMAIL', message: 'Valid email address is required.' });
+  }
+
+  // Update user in usersDb
+  const userIdx = usersDb.findIndex((u) => u.id === user.id);
+  if (userIdx !== -1) {
+    usersDb[userIdx] = {
+      ...usersDb[userIdx],
+      name: body.name !== undefined ? body.name.trim() : usersDb[userIdx].name,
+      phone: body.phone !== undefined ? body.phone.trim() : usersDb[userIdx].phone,
+      email: body.email !== undefined ? body.email.trim() : usersDb[userIdx].email,
+      location: body.location ? { ...usersDb[userIdx].location, ...body.location } : usersDb[userIdx].location,
+    };
+  }
+
+  // Update user_settings
+  const currentSettings = userSettingsDb.get(user.id) || getDefaultUserSettings(user.id, user.preferredLanguage || 'en');
+  const updatedSettings: UserSettings = {
+    ...currentSettings,
+    updatedAt: new Date().toISOString(),
+  };
+  userSettingsDb.set(user.id, updatedSettings);
+
+  recordAudit('UPDATE_PROFILE', 'USER', user.id, user.name, 'FARMER', body);
+
+  res.json({
+    success: true,
+    user: userIdx !== -1 ? usersDb[userIdx] : user,
+    settings: updatedSettings,
+    message: 'Farmer profile successfully updated.',
+  });
+});
+
+app.patch('/api/expert/settings/profile', (req: Request, res: Response) => {
+  const user = getRequestUser(req);
+  if (!user) return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
+
+  const body = req.body || {};
+
+  // Validation
+  if (body.name !== undefined && (!body.name || typeof body.name !== 'string' || body.name.trim().length === 0)) {
+    return res.status(400).json({ success: false, error: 'INVALID_NAME', message: 'Full name cannot be empty.' });
+  }
+
+  // Update user in usersDb
+  const userIdx = usersDb.findIndex((u) => u.id === user.id);
+  if (userIdx !== -1) {
+    usersDb[userIdx] = {
+      ...usersDb[userIdx],
+      name: body.name !== undefined ? body.name.trim() : usersDb[userIdx].name,
+      organization: body.organization !== undefined ? body.organization.trim() : usersDb[userIdx].organization,
+      specialization: body.specialization !== undefined ? body.specialization : usersDb[userIdx].specialization,
+    };
+  }
+
+  // Update expert preferences
+  const currentExpertPrefs = expertPrefsDb.get(user.id) || getDefaultExpertPreferences(user.id);
+  const updatedExpertPrefs: ExpertPreferences = {
+    ...currentExpertPrefs,
+    qualification: body.qualification !== undefined ? body.qualification : currentExpertPrefs.qualification,
+    organization: body.organization !== undefined ? body.organization : currentExpertPrefs.organization,
+    specialization: body.specialization !== undefined ? body.specialization : currentExpertPrefs.specialization,
+    bio: body.bio !== undefined ? body.bio : currentExpertPrefs.bio,
+    updatedAt: new Date().toISOString(),
+  };
+  expertPrefsDb.set(user.id, updatedExpertPrefs);
+
+  recordAudit('UPDATE_EXPERT_PROFILE', 'USER', user.id, user.name, 'EXPERT', body);
+
+  res.json({
+    success: true,
+    user: userIdx !== -1 ? usersDb[userIdx] : user,
+    preferences: updatedExpertPrefs,
+    message: 'Expert professional profile successfully updated.',
+  });
+});
+
 app.get('/api/settings/farmer-prefs', (req: Request, res: Response) => {
   const user = getRequestUser(req);
   if (!user) return res.status(401).json({ success: false, error: 'UNAUTHORIZED' });
