@@ -100,6 +100,13 @@ export const ExpertSettingsView: React.FC<Props> = ({ user, onNavigate }) => {
         };
         StorageService.updateUser(updated);
         StorageService.setCurrentUser(updated);
+        await API.updateExpertProfile({
+          name,
+          email,
+          phone,
+          specialization,
+          organization,
+        });
       } else if (activeTab === 'workflow' || activeTab === 'availability' || activeTab === 'copilot') {
         StorageService.updateExpertPreferences(user.id, expertPrefs);
         await API.updateExpertPreferences(expertPrefs);

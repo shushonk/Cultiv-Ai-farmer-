@@ -630,6 +630,20 @@ class ApiService {
     });
   }
 
+  public async updateFarmerProfile(data: any): Promise<{ success: boolean; user: User; message?: string }> {
+    return this.request('/api/farmer/settings/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async updateExpertProfile(data: any): Promise<{ success: boolean; user: User; message?: string }> {
+    return this.request('/api/expert/settings/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
   public async getFarmerPreferences(): Promise<{ success: boolean; preferences: any }> {
     return this.request('/api/settings/farmer-prefs');
   }

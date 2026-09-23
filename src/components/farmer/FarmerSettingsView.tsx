@@ -118,6 +118,17 @@ export const FarmerSettingsView: React.FC<Props> = ({ user, onNavigate }) => {
         };
         StorageService.updateUser(updatedUser);
         StorageService.setCurrentUser(updatedUser);
+        await API.updateFarmerProfile({
+          name: profileName,
+          email: profileEmail,
+          phone: profilePhone,
+          location: {
+            state: user.location?.state || 'Karnataka',
+            district,
+            taluk,
+            village,
+          },
+        });
       } else if (activeTab === 'language' || activeTab === 'display') {
         StorageService.updateUserSettings(user.id, userSettings);
         await API.updateUserSettings(userSettings);
