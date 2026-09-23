@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, CaseRecord, UserRole } from '../../types';
 import { StorageService } from '../../services/storage';
+import { API } from '../../services/api';
 import { StatusBadge, SeverityBadge, RiskBadge } from '../common/StatusBadge';
 import { RiskIndicator } from '../common/RiskIndicator';
 import { CaseTimeline } from '../common/CaseTimeline';
+import { ExpertSettingsView } from './ExpertSettingsView';
 import {
   Microscope,
   CheckCircle2,
@@ -78,9 +80,28 @@ export const ExpertViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
   };
 
   // Submit Expert Verification
-  const handleSubmitReview = (e: React.FormEvent) => {
+  const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCase) return;
+
+    try {
+      await API.reviewCase(selectedCase.id, {
+        confirmedCondition: confirmedCondition || selectedCase.aiPrediction.condition,
+        severity: confirmedSeverity,
+        notes: advisoryNotes,
+        expertName: user.name,
+        expertId: user.id,
+        sampleRequested: requiresSample,
+        ipmProtocol: {
+          cultural: culturalNotes,
+          biological: bioNotes,
+          chemical: chemNotes,
+          phiDays: phiDays,
+        },
+      });
+    } catch (err) {
+      console.warn('Backend API review sync error:', err);
+    }
 
     const updatedCase = StorageService.addExpertReview(selectedCase.id, {
       id: `rev-${Date.now()}`,
@@ -526,6 +547,13 @@ export const ExpertViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
         </div>
       </div>
     );
+  }
+
+  // ----------------------------------------------------
+  // SUB-VIEW: EXPERT SETTINGS
+  // ----------------------------------------------------
+  if (subPath === 'settings' || subPath === 'profile') {
+    return <ExpertSettingsView user={user} onNavigate={onNavigate} />;
   }
 
   // ----------------------------------------------------

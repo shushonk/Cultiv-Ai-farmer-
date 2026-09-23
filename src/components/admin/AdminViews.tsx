@@ -13,6 +13,7 @@ import { GlobalAlertsView } from './GlobalAlertsView';
 import { AuditLogsView } from './AuditLogsView';
 import { ReportsAnalyticsView } from './ReportsAnalyticsView';
 import { SystemSettingsView } from './SystemSettingsView';
+import { CultivAIMap } from '../maps/CultivAIMap';
 
 interface Props {
   user: User;
@@ -26,6 +27,20 @@ export const AdminViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
     case 'health':
     case 'telemetry':
       return <SystemHealthDashboard />;
+
+    case 'map':
+    case 'surveillance-map':
+      return (
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Central GIS Surveillance Console</h1>
+              <p className="text-xs text-slate-400">Master geospatial overlay of epidemic hot zones, parcels, and field verifications</p>
+            </div>
+          </div>
+          <CultivAIMap height="600px" />
+        </div>
+      );
 
     case 'users':
       return <UserDirectoryView currentUser={user} />;

@@ -15,6 +15,26 @@ import {
   FollowUpEntry
 } from '../types';
 import {
+  UserSettings,
+  NotificationPreferences,
+  PrivacyPreferences,
+  SecuritySessionItem,
+  FarmerPreferences,
+  ExpertPreferences,
+  OfficerPreferences,
+  SystemSettings,
+} from '../types/settings';
+import {
+  DEFAULT_SYSTEM_SETTINGS,
+  getDefaultUserSettings,
+  getDefaultNotificationPreferences,
+  getDefaultPrivacyPreferences,
+  getDefaultFarmerPreferences,
+  getDefaultExpertPreferences,
+  getDefaultOfficerPreferences,
+  getInitialSessions,
+} from '../data/defaultSettings';
+import {
   SEED_USERS,
   SEED_FIELDS,
   SEED_CASES,
@@ -38,6 +58,14 @@ const STORAGE_KEYS = {
   KNOWLEDGE: 'cultivai_knowledge_v2',
   AUDIT_LOGS: 'cultivai_audit_logs_v2',
   LANGUAGE: 'cultivai_language_v2',
+  USER_SETTINGS: 'cultivai_user_settings_v2',
+  NOTIFICATION_PREFS: 'cultivai_notification_prefs_v2',
+  PRIVACY_PREFS: 'cultivai_privacy_prefs_v2',
+  SECURITY_SESSIONS: 'cultivai_security_sessions_v2',
+  SYSTEM_SETTINGS: 'cultivai_system_settings_v2',
+  FARMER_PREFS: 'cultivai_farmer_prefs_v2',
+  EXPERT_PREFS: 'cultivai_expert_prefs_v2',
+  OFFICER_PREFS: 'cultivai_officer_prefs_v2',
 };
 
 // Generic safe storage helper
@@ -632,6 +660,208 @@ export const StorageService = {
     setStored(STORAGE_KEYS.AUDIT_LOGS, logs);
   },
 
+  // --- Settings & Preferences ---
+  getUserSettings(userId: string): UserSettings {
+    const all = getStored<Record<string, UserSettings>>(STORAGE_KEYS.USER_SETTINGS, {});
+    if (!all[userId]) {
+      const def = getDefaultUserSettings(userId, this.getLanguage());
+      all[userId] = def;
+      setStored(STORAGE_KEYS.USER_SETTINGS, all);
+    }
+    return all[userId];
+  },
+
+  updateUserSettings(userId: string, updates: Partial<UserSettings>): UserSettings {
+    const all = getStored<Record<string, UserSettings>>(STORAGE_KEYS.USER_SETTINGS, {});
+    const current = all[userId] || getDefaultUserSettings(userId, this.getLanguage());
+    const updated: UserSettings = {
+      ...current,
+      ...updates,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+    all[userId] = updated;
+    setStored(STORAGE_KEYS.USER_SETTINGS, all);
+    if (updates.language) {
+      this.setLanguage(updates.language);
+    }
+    return updated;
+  },
+
+  getNotificationPreferences(userId: string): NotificationPreferences {
+    const all = getStored<Record<string, NotificationPreferences>>(STORAGE_KEYS.NOTIFICATION_PREFS, {});
+    if (!all[userId]) {
+      const def = getDefaultNotificationPreferences(userId);
+      all[userId] = def;
+      setStored(STORAGE_KEYS.NOTIFICATION_PREFS, all);
+    }
+    return all[userId];
+  },
+
+  updateNotificationPreferences(userId: string, updates: Partial<NotificationPreferences>): NotificationPreferences {
+    const all = getStored<Record<string, NotificationPreferences>>(STORAGE_KEYS.NOTIFICATION_PREFS, {});
+    const current = all[userId] || getDefaultNotificationPreferences(userId);
+    const updated: NotificationPreferences = {
+      ...current,
+      ...updates,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+    all[userId] = updated;
+    setStored(STORAGE_KEYS.NOTIFICATION_PREFS, all);
+    return updated;
+  },
+
+  getPrivacyPreferences(userId: string): PrivacyPreferences {
+    const all = getStored<Record<string, PrivacyPreferences>>(STORAGE_KEYS.PRIVACY_PREFS, {});
+    if (!all[userId]) {
+      const def = getDefaultPrivacyPreferences(userId);
+      all[userId] = def;
+      setStored(STORAGE_KEYS.PRIVACY_PREFS, all);
+    }
+    return all[userId];
+  },
+
+  updatePrivacyPreferences(userId: string, updates: Partial<PrivacyPreferences>): PrivacyPreferences {
+    const all = getStored<Record<string, PrivacyPreferences>>(STORAGE_KEYS.PRIVACY_PREFS, {});
+    const current = all[userId] || getDefaultPrivacyPreferences(userId);
+    const updated: PrivacyPreferences = {
+      ...current,
+      ...updates,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+    all[userId] = updated;
+    setStored(STORAGE_KEYS.PRIVACY_PREFS, all);
+    return updated;
+  },
+
+  getSecuritySessions(userId: string): SecuritySessionItem[] {
+    const all = getStored<Record<string, SecuritySessionItem[]>>(STORAGE_KEYS.SECURITY_SESSIONS, {});
+    if (!all[userId] || all[userId].length === 0) {
+      all[userId] = getInitialSessions(userId);
+      setStored(STORAGE_KEYS.SECURITY_SESSIONS, all);
+    }
+    return all[userId];
+  },
+
+  terminateSession(userId: string, sessionId: string): void {
+    const all = getStored<Record<string, SecuritySessionItem[]>>(STORAGE_KEYS.SECURITY_SESSIONS, {});
+    if (all[userId]) {
+      all[userId] = all[userId].filter((s) => s.id !== sessionId);
+      setStored(STORAGE_KEYS.SECURITY_SESSIONS, all);
+    }
+  },
+
+  terminateAllOtherSessions(userId: string): void {
+    const all = getStored<Record<string, SecuritySessionItem[]>>(STORAGE_KEYS.SECURITY_SESSIONS, {});
+    if (all[userId]) {
+      all[userId] = all[userId].filter((s) => s.isCurrent);
+      setStored(STORAGE_KEYS.SECURITY_SESSIONS, all);
+    }
+  },
+
+  getFarmerPreferences(userId: string): FarmerPreferences {
+    const all = getStored<Record<string, FarmerPreferences>>(STORAGE_KEYS.FARMER_PREFS, {});
+    if (!all[userId]) {
+      const def = getDefaultFarmerPreferences(userId);
+      all[userId] = def;
+      setStored(STORAGE_KEYS.FARMER_PREFS, all);
+    }
+    return all[userId];
+  },
+
+  updateFarmerPreferences(userId: string, updates: Partial<FarmerPreferences>): FarmerPreferences {
+    const all = getStored<Record<string, FarmerPreferences>>(STORAGE_KEYS.FARMER_PREFS, {});
+    const current = all[userId] || getDefaultFarmerPreferences(userId);
+    const updated: FarmerPreferences = {
+      ...current,
+      ...updates,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+    all[userId] = updated;
+    setStored(STORAGE_KEYS.FARMER_PREFS, all);
+    return updated;
+  },
+
+  getExpertPreferences(userId: string): ExpertPreferences {
+    const all = getStored<Record<string, ExpertPreferences>>(STORAGE_KEYS.EXPERT_PREFS, {});
+    if (!all[userId]) {
+      const def = getDefaultExpertPreferences(userId);
+      all[userId] = def;
+      setStored(STORAGE_KEYS.EXPERT_PREFS, all);
+    }
+    return all[userId];
+  },
+
+  updateExpertPreferences(userId: string, updates: Partial<ExpertPreferences>): ExpertPreferences {
+    const all = getStored<Record<string, ExpertPreferences>>(STORAGE_KEYS.EXPERT_PREFS, {});
+    const current = all[userId] || getDefaultExpertPreferences(userId);
+    const updated: ExpertPreferences = {
+      ...current,
+      ...updates,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+    all[userId] = updated;
+    setStored(STORAGE_KEYS.EXPERT_PREFS, all);
+    return updated;
+  },
+
+  getOfficerPreferences(userId: string): OfficerPreferences {
+    const all = getStored<Record<string, OfficerPreferences>>(STORAGE_KEYS.OFFICER_PREFS, {});
+    if (!all[userId]) {
+      const def = getDefaultOfficerPreferences(userId);
+      all[userId] = def;
+      setStored(STORAGE_KEYS.OFFICER_PREFS, all);
+    }
+    return all[userId];
+  },
+
+  updateOfficerPreferences(userId: string, updates: Partial<OfficerPreferences>): OfficerPreferences {
+    const all = getStored<Record<string, OfficerPreferences>>(STORAGE_KEYS.OFFICER_PREFS, {});
+    const current = all[userId] || getDefaultOfficerPreferences(userId);
+    const updated: OfficerPreferences = {
+      ...current,
+      ...updates,
+      userId,
+      updatedAt: new Date().toISOString(),
+    };
+    all[userId] = updated;
+    setStored(STORAGE_KEYS.OFFICER_PREFS, all);
+    return updated;
+  },
+
+  getSystemSettings(): SystemSettings {
+    return getStored<SystemSettings>(STORAGE_KEYS.SYSTEM_SETTINGS, DEFAULT_SYSTEM_SETTINGS);
+  },
+
+  updateSystemSettings(updates: Partial<SystemSettings>): SystemSettings {
+    const current = this.getSystemSettings();
+    const updated: SystemSettings = {
+      ...current,
+      ...updates,
+      general: { ...current.general, ...(updates.general || {}) },
+      security: { ...current.security, ...(updates.security || {}) },
+      usersAndRoles: { ...current.usersAndRoles, ...(updates.usersAndRoles || {}) },
+      authentication: { ...current.authentication, ...(updates.authentication || {}) },
+      notifications: { ...current.notifications, ...(updates.notifications || {}) },
+      ai: { ...current.ai, ...(updates.ai || {}) },
+      weather: { ...current.weather, ...(updates.weather || {}) },
+      maps: { ...current.maps, ...(updates.maps || {}) },
+      languages: { ...current.languages, ...(updates.languages || {}) },
+      caseManagement: { ...current.caseManagement, ...(updates.caseManagement || {}) },
+      fileUploads: { ...current.fileUploads, ...(updates.fileUploads || {}) },
+      privacy: { ...current.privacy, ...(updates.privacy || {}) },
+      email: { ...current.email, ...(updates.email || {}) },
+      maintenance: { ...current.maintenance, ...(updates.maintenance || {}) },
+      system: { ...current.system, ...(updates.system || {}) },
+    };
+    setStored(STORAGE_KEYS.SYSTEM_SETTINGS, updated);
+    return updated;
+  },
+
   // Reset demo state
   resetToDemo(): void {
     localStorage.removeItem(STORAGE_KEYS.USERS);
@@ -644,5 +874,13 @@ export const StorageService = {
     localStorage.removeItem(STORAGE_KEYS.MESSAGES);
     localStorage.removeItem(STORAGE_KEYS.KNOWLEDGE);
     localStorage.removeItem(STORAGE_KEYS.AUDIT_LOGS);
+    localStorage.removeItem(STORAGE_KEYS.USER_SETTINGS);
+    localStorage.removeItem(STORAGE_KEYS.NOTIFICATION_PREFS);
+    localStorage.removeItem(STORAGE_KEYS.PRIVACY_PREFS);
+    localStorage.removeItem(STORAGE_KEYS.SECURITY_SESSIONS);
+    localStorage.removeItem(STORAGE_KEYS.SYSTEM_SETTINGS);
+    localStorage.removeItem(STORAGE_KEYS.FARMER_PREFS);
+    localStorage.removeItem(STORAGE_KEYS.EXPERT_PREFS);
+    localStorage.removeItem(STORAGE_KEYS.OFFICER_PREFS);
   }
 };

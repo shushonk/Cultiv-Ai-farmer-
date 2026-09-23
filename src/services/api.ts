@@ -408,6 +408,279 @@ class ApiService {
   public async pingTimestamp(): Promise<{ status: string; timestamp: number; hrTime: string; uptimeSeconds: number }> {
     return this.request('/api/health/ping');
   }
+
+  // --------------------------------------------------------------------------
+  // DOMAIN REST APIS (CASES, FIELDS, ALERTS, INSPECTIONS, SAMPLES, AI)
+  // --------------------------------------------------------------------------
+
+  public async getCases(params: Record<string, string> = {}): Promise<{ success: boolean; count: number; cases: any[] }> {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/api/cases${query ? `?${query}` : ''}`);
+  }
+
+  public async getCase(id: string): Promise<{ success: boolean; case: any }> {
+    return this.request(`/api/cases/${id}`);
+  }
+
+  public async createCase(caseData: any): Promise<{ success: boolean; case: any }> {
+    return this.request('/api/cases', {
+      method: 'POST',
+      body: JSON.stringify(caseData),
+    });
+  }
+
+  public async reviewCase(id: string, reviewData: any): Promise<{ success: boolean; case: any }> {
+    return this.request(`/api/cases/${id}/review`, {
+      method: 'POST',
+      body: JSON.stringify(reviewData),
+    });
+  }
+
+  public async submitFollowUp(id: string, followUpData: any): Promise<{ success: boolean; case: any }> {
+    return this.request(`/api/cases/${id}/follow-up`, {
+      method: 'POST',
+      body: JSON.stringify(followUpData),
+    });
+  }
+
+  public async getFields(farmerId?: string): Promise<{ success: boolean; count: number; fields: any[] }> {
+    const q = farmerId ? `?farmerId=${encodeURIComponent(farmerId)}` : '';
+    return this.request(`/api/fields${q}`);
+  }
+
+  public async createField(fieldData: any): Promise<{ success: boolean; field: any }> {
+    return this.request('/api/fields', {
+      method: 'POST',
+      body: JSON.stringify(fieldData),
+    });
+  }
+
+  public async updateField(id: string, fieldData: any): Promise<{ success: boolean; field: any }> {
+    return this.request(`/api/fields/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(fieldData),
+    });
+  }
+
+  public async deleteField(id: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/api/fields/${id}`, { method: 'DELETE' });
+  }
+
+  public async getAlerts(role?: string, userId?: string): Promise<{ success: boolean; count: number; alerts: any[] }> {
+    const params = new URLSearchParams();
+    if (role) params.set('role', role);
+    if (userId) params.set('userId', userId);
+    const q = params.toString();
+    return this.request(`/api/alerts${q ? `?${q}` : ''}`);
+  }
+
+  public async broadcastAlert(alertData: any): Promise<{ success: boolean; alert: any }> {
+    return this.request('/api/alerts', {
+      method: 'POST',
+      body: JSON.stringify(alertData),
+    });
+  }
+
+  public async getInspections(): Promise<{ success: boolean; count: number; visits: any[] }> {
+    return this.request('/api/inspections');
+  }
+
+  public async scheduleInspection(inspectionData: any): Promise<{ success: boolean; visit: any }> {
+    return this.request('/api/inspections', {
+      method: 'POST',
+      body: JSON.stringify(inspectionData),
+    });
+  }
+
+  public async updateInspection(id: string, inspectionData: any): Promise<{ success: boolean; visit: any }> {
+    return this.request(`/api/inspections/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(inspectionData),
+    });
+  }
+
+  public async getSamples(): Promise<{ success: boolean; count: number; samples: any[] }> {
+    return this.request('/api/samples');
+  }
+
+  public async requestSample(sampleData: any): Promise<{ success: boolean; sample: any }> {
+    return this.request('/api/samples', {
+      method: 'POST',
+      body: JSON.stringify(sampleData),
+    });
+  }
+
+  public async updateSample(id: string, sampleData: any): Promise<{ success: boolean; sample: any }> {
+    return this.request(`/api/samples/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(sampleData),
+    });
+  }
+
+  public async getMessages(): Promise<{ success: boolean; count: number; messages: any[] }> {
+    return this.request('/api/messages');
+  }
+
+  public async sendMessage(messageData: any): Promise<{ success: boolean; message: any }> {
+    return this.request('/api/messages', {
+      method: 'POST',
+      body: JSON.stringify(messageData),
+    });
+  }
+
+  public async getHotspots(): Promise<{ success: boolean; count: number; hotspots: any[] }> {
+    return this.request('/api/surveillance/clusters');
+  }
+
+  public async getKnowledge(search?: string): Promise<{ success: boolean; count: number; articles: any[] }> {
+    const q = search ? `?search=${encodeURIComponent(search)}` : '';
+    return this.request(`/api/knowledge${q}`);
+  }
+
+  public async getWeather(): Promise<{ success: boolean; count: number; stations: any[] }> {
+    return this.request('/api/weather/microclimate');
+  }
+
+  public async getUsers(): Promise<{ success: boolean; count: number; users: any[] }> {
+    return this.request('/api/admin/users');
+  }
+
+  public async createUser(userData: any): Promise<{ success: boolean; user: any }> {
+    return this.request('/api/admin/users', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  public async updateUser(id: string, userData: any): Promise<{ success: boolean; user: any }> {
+    return this.request(`/api/admin/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData),
+    });
+  }
+
+  public async deleteUser(id: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/api/admin/users/${id}`, { method: 'DELETE' });
+  }
+
+  public async getAuditLogs(): Promise<{ success: boolean; count: number; logs: any[] }> {
+    return this.request('/api/admin/audit-logs');
+  }
+
+  public async diagnoseCrop(crop: string, symptoms: string, image?: string): Promise<{ success: boolean; source: string; diagnosis: any }> {
+    return this.request('/api/ai/diagnose', {
+      method: 'POST',
+      body: JSON.stringify({ crop, symptoms, image }),
+    });
+  }
+
+  public async askCopilot(question: string, role: string, crop?: string, location?: string): Promise<{ success: boolean; source: string; answer: string }> {
+    return this.request('/api/ai/copilot', {
+      method: 'POST',
+      body: JSON.stringify({ question, role, crop, location }),
+    });
+  }
+
+  // --- Settings Endpoints ---
+  public async getUserSettings(): Promise<{ success: boolean; settings: any }> {
+    return this.request('/api/settings/me');
+  }
+
+  public async updateUserSettings(data: any): Promise<{ success: boolean; settings: any }> {
+    return this.request('/api/settings/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getNotificationPreferences(): Promise<{ success: boolean; notifications: any }> {
+    return this.request('/api/settings/notifications');
+  }
+
+  public async updateNotificationPreferences(data: any): Promise<{ success: boolean; notifications: any }> {
+    return this.request('/api/settings/notifications', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getPrivacyPreferences(): Promise<{ success: boolean; privacy: any }> {
+    return this.request('/api/settings/privacy');
+  }
+
+  public async updatePrivacyPreferences(data: any): Promise<{ success: boolean; privacy: any }> {
+    return this.request('/api/settings/privacy', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getSecuritySessions(): Promise<{ success: boolean; sessions: any[] }> {
+    return this.request('/api/settings/sessions');
+  }
+
+  public async revokeSession(sessionId: string): Promise<{ success: boolean; message: string }> {
+    return this.request(`/api/settings/sessions/${sessionId}`, { method: 'DELETE' });
+  }
+
+  public async changePassword(data: { currentPassword?: string; newPassword: string; confirmPassword: string }): Promise<{ success: boolean; message: string }> {
+    return this.request('/api/settings/change-password', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getFarmerPreferences(): Promise<{ success: boolean; preferences: any }> {
+    return this.request('/api/settings/farmer-prefs');
+  }
+
+  public async updateFarmerPreferences(data: any): Promise<{ success: boolean; preferences: any }> {
+    return this.request('/api/settings/farmer-prefs', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getExpertPreferences(): Promise<{ success: boolean; preferences: any }> {
+    return this.request('/api/settings/expert-prefs');
+  }
+
+  public async updateExpertPreferences(data: any): Promise<{ success: boolean; preferences: any }> {
+    return this.request('/api/settings/expert-prefs', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getOfficerPreferences(): Promise<{ success: boolean; preferences: any }> {
+    return this.request('/api/settings/officer-prefs');
+  }
+
+  public async updateOfficerPreferences(data: any): Promise<{ success: boolean; preferences: any }> {
+    return this.request('/api/settings/officer-prefs', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async getAdminPlatformSettings(): Promise<{ success: boolean; settings: any }> {
+    return this.request('/api/admin/settings');
+  }
+
+  public async updateAdminPlatformSettings(data: any, section?: string): Promise<{ success: boolean; settings: any }> {
+    const url = section ? `/api/admin/settings?section=${section}` : '/api/admin/settings';
+    return this.request(url, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async testEmail(recipient: string): Promise<{ success: boolean; message: string }> {
+    return this.request('/api/admin/settings/email/test', {
+      method: 'POST',
+      body: JSON.stringify({ recipient }),
+    });
+  }
 }
 
 export const API = new ApiService();

@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, UserRole } from '../../types';
+import { useI18n } from '../../i18n';
 import {
   LayoutDashboard,
   Sprout,
@@ -43,63 +44,64 @@ interface NavItem {
 }
 
 export const Sidebar: React.FC<Props> = ({ user, currentPath, onNavigate, isOpen, onClose }) => {
+  const { t } = useI18n();
+
   const getNavItems = (role: UserRole): NavItem[] => {
     switch (role) {
       case 'FARMER':
         return [
-          { label: 'Dashboard', path: '/farmer/dashboard', icon: LayoutDashboard },
-          { label: 'My Fields', path: '/farmer/fields', icon: Sprout },
-          { label: 'Scan & Diagnose', path: '/farmer/scan', icon: Camera, badge: 'AI' },
-          { label: 'Cases & Diagnoses', path: '/farmer/cases', icon: FileText },
-          { label: 'Weather & Alerts', path: '/farmer/alerts', icon: AlertTriangle },
-          { label: 'Expert Chat', path: '/farmer/messages', icon: MessageSquare },
-          { label: 'AI Assistant', path: '/farmer/assistant', icon: Bot, badge: 'Live' },
-          { label: 'Farm Profile', path: '/farmer/profile', icon: UserIcon },
-          { label: 'Settings', path: '/farmer/settings', icon: Settings },
+          { label: t('nav.dashboard'), path: '/farmer/dashboard', icon: LayoutDashboard },
+          { label: t('nav.fields'), path: '/farmer/fields', icon: Sprout },
+          { label: t('nav.scan'), path: '/farmer/scan', icon: Camera, badge: 'AI' },
+          { label: t('nav.cases'), path: '/farmer/cases', icon: FileText },
+          { label: t('nav.alerts'), path: '/farmer/alerts', icon: AlertTriangle },
+          { label: t('nav.messages'), path: '/farmer/messages', icon: MessageSquare },
+          { label: t('nav.assistant'), path: '/farmer/assistant', icon: Bot, badge: 'Live' },
+          { label: t('nav.profile'), path: '/farmer/profile', icon: UserIcon },
+          { label: t('nav.settings'), path: '/farmer/settings', icon: Settings },
         ];
 
       case 'EXPERT':
         return [
-          { label: 'Expert Dashboard', path: '/expert/dashboard', icon: LayoutDashboard },
-          { label: 'Verification Queue', path: '/expert/verification', icon: CheckCircle2, badge: 'Review' },
-          { label: 'Investigations', path: '/expert/investigations', icon: Microscope },
-          { label: 'Case Repository', path: '/expert/cases', icon: FileText },
-          { label: 'Lab Samples', path: '/expert/samples', icon: FlaskConical },
-          { label: 'Farmer Direct Messages', path: '/expert/messages', icon: MessageSquare },
-          { label: 'Knowledge Base', path: '/expert/knowledge', icon: BookOpen },
-          { label: 'AI Diagnostic Copilot', path: '/expert/assistant', icon: Bot },
-          { label: 'Specialist Profile', path: '/expert/profile', icon: UserIcon },
+          { label: t('nav.dashboard'), path: '/expert/dashboard', icon: LayoutDashboard },
+          { label: t('nav.verification'), path: '/expert/verification', icon: CheckCircle2, badge: 'Review' },
+          { label: t('nav.investigations'), path: '/expert/investigations', icon: Microscope },
+          { label: t('nav.cases'), path: '/expert/cases', icon: FileText },
+          { label: t('nav.samples'), path: '/expert/samples', icon: FlaskConical },
+          { label: t('nav.messages'), path: '/expert/messages', icon: MessageSquare },
+          { label: t('nav.knowledge'), path: '/expert/knowledge', icon: BookOpen },
+          { label: t('nav.assistant'), path: '/expert/assistant', icon: Bot },
+          { label: t('nav.profile'), path: '/expert/profile', icon: UserIcon },
+          { label: t('nav.settings'), path: '/expert/settings', icon: Settings },
         ];
 
       case 'OFFICER':
         return [
-          { label: 'Surveillance Dashboard', path: '/officer/dashboard', icon: LayoutDashboard },
-          { label: 'Geospatial Map', path: '/officer/map', icon: MapPin, badge: 'Live' },
-          { label: 'Epidemic Hotspots', path: '/officer/hotspots', icon: Flame },
-          { label: 'Regional Cases', path: '/officer/cases', icon: FileText },
-          { label: 'Field Operations', path: '/officer/field-operations', icon: Calendar },
-          { label: 'Broadcast Alerts', path: '/officer/alerts', icon: AlertTriangle },
-          { label: 'Surveillance Reports', path: '/officer/reports', icon: BarChart3 },
-          { label: 'Officer Messages', path: '/officer/messages', icon: MessageSquare },
-          { label: 'Surveillance Copilot', path: '/officer/assistant', icon: Bot },
-          { label: 'Officer Profile', path: '/officer/profile', icon: UserIcon },
+          { label: t('nav.dashboard'), path: '/officer/dashboard', icon: LayoutDashboard },
+          { label: t('nav.map'), path: '/officer/map', icon: MapPin, badge: 'Live' },
+          { label: t('nav.hotspots'), path: '/officer/hotspots', icon: Flame },
+          { label: t('nav.cases'), path: '/officer/cases', icon: FileText },
+          { label: t('nav.fieldOperations'), path: '/officer/field-operations', icon: Calendar },
+          { label: t('nav.alerts'), path: '/officer/alerts', icon: AlertTriangle },
+          { label: t('nav.reports'), path: '/officer/reports', icon: BarChart3 },
+          { label: t('nav.messages'), path: '/officer/messages', icon: MessageSquare },
+          { label: t('nav.assistant'), path: '/officer/assistant', icon: Bot },
+          { label: t('nav.profile'), path: '/officer/profile', icon: UserIcon },
+          { label: t('nav.settings'), path: '/officer/settings', icon: Settings },
         ];
 
       case 'ADMIN':
         return [
-          { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-          { label: 'System Health', path: '/admin/system-health', icon: Activity, badge: 'Live' },
-          { label: 'User Directory', path: '/admin/users', icon: Users },
-          { label: 'Farmers Registry', path: '/admin/farmers', icon: Sprout },
-          { label: 'Experts Registry', path: '/admin/experts', icon: CheckCircle2 },
-          { label: 'Officers Registry', path: '/admin/officers', icon: Shield },
-          { label: 'All Platform Cases', path: '/admin/cases', icon: FileText },
-          { label: 'Crops & Pathogens', path: '/admin/crops-pathogens', icon: Layers },
-          { label: 'Knowledge Articles', path: '/admin/knowledge', icon: BookOpen },
-          { label: 'Global Alerts', path: '/admin/alerts', icon: AlertTriangle },
-          { label: 'Security Audit Logs', path: '/admin/audit-logs', icon: History, badge: 'Sec' },
-          { label: 'Reports & Analytics', path: '/admin/reports', icon: BarChart3 },
-          { label: 'System Settings', path: '/admin/settings', icon: Settings },
+          { label: t('nav.dashboard'), path: '/admin/dashboard', icon: LayoutDashboard },
+          { label: t('nav.health'), path: '/admin/system-health', icon: Activity, badge: 'Live' },
+          { label: t('nav.users'), path: '/admin/users', icon: Users },
+          { label: t('admin.surveillanceMap'), path: '/admin/map', icon: MapPin },
+          { label: t('nav.cases'), path: '/admin/cases', icon: FileText },
+          { label: t('nav.knowledge'), path: '/admin/knowledge', icon: BookOpen },
+          { label: t('nav.alerts'), path: '/admin/alerts', icon: AlertTriangle },
+          { label: t('nav.auditLogs'), path: '/admin/audit-logs', icon: History, badge: 'Sec' },
+          { label: t('nav.reports'), path: '/admin/reports', icon: BarChart3 },
+          { label: t('nav.settings'), path: '/admin/settings', icon: Settings },
         ];
     }
   };

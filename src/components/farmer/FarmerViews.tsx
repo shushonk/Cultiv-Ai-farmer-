@@ -6,6 +6,7 @@ import { AIAssistantService, ChatMessage } from '../../services/aiAssistantServi
 import { StatusBadge, SeverityBadge, RiskBadge } from '../common/StatusBadge';
 import { RiskIndicator } from '../common/RiskIndicator';
 import { CaseTimeline } from '../common/CaseTimeline';
+import { FarmerSettingsView } from './FarmerSettingsView';
 import {
   Sprout,
   Camera,
@@ -1528,6 +1529,10 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
   // ----------------------------------------------------
   // SUB-VIEW: FARM PROFILE & SETTINGS
   // ----------------------------------------------------
+  if (subPath === 'settings' || subPath === 'profile') {
+    return <FarmerSettingsView user={user} onNavigate={onNavigate} />;
+  }
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold text-white">Farm Profile & Preferences</h1>
