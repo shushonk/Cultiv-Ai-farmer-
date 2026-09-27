@@ -98,15 +98,38 @@ export const StorageService = {
   },
 
   setCurrentUser(user: User | null): void {
+    if (user && typeof window !== 'undefined') {
+      const activeLang = (localStorage.getItem(STORAGE_KEYS.LANGUAGE) as Language) || user.preferredLanguage || 'en';
+      if (['en', 'kn', 'hi', 'mr'].includes(activeLang)) {
+        user.preferredLanguage = activeLang;
+        localStorage.setItem(STORAGE_KEYS.LANGUAGE, activeLang);
+        document.documentElement.lang = activeLang;
+        window.dispatchEvent(new CustomEvent('cultivai_language_changed', { detail: activeLang }));
+      }
+    }
     setStored<User | null>(STORAGE_KEYS.SESSION, user);
   },
 
   getLanguage(): Language {
-    return getStored<Language>(STORAGE_KEYS.LANGUAGE, 'en');
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(STORAGE_KEYS.LANGUAGE) as Language;
+      if (stored && ['en', 'kn', 'hi', 'mr'].includes(stored)) {
+        return stored;
+      }
+      const session = this.getCurrentUser();
+      if (session?.preferredLanguage && ['en', 'kn', 'hi', 'mr'].includes(session.preferredLanguage)) {
+        return session.preferredLanguage;
+      }
+    }
+    return 'en';
   },
 
   setLanguage(lang: Language): void {
     setStored<Language>(STORAGE_KEYS.LANGUAGE, lang);
+    if (typeof window !== 'undefined') {
+      document.documentElement.lang = lang;
+      window.dispatchEvent(new CustomEvent('cultivai_language_changed', { detail: lang }));
+    }
     const user = this.getCurrentUser();
     if (user) {
       user.preferredLanguage = lang;

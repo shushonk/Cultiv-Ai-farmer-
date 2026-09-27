@@ -5,6 +5,7 @@ import { API } from '../../services/api';
 import { StatusBadge, SeverityBadge, RiskBadge } from '../common/StatusBadge';
 import { RiskIndicator } from '../common/RiskIndicator';
 import { CaseTimeline } from '../common/CaseTimeline';
+import { SafeImage } from '../common/SafeImage';
 import { ExpertSettingsView } from './ExpertSettingsView';
 import {
   Microscope,
@@ -362,10 +363,11 @@ export const ExpertViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* High-res Image Preview */}
                   <div className="relative rounded-xl overflow-hidden bg-black border border-slate-800 flex items-center justify-center">
-                    <img
+                    <SafeImage
                       src={selectedCase.images[0]?.url}
                       alt="Crop specimen"
-                      referrerPolicy="no-referrer"
+                      fallbackCrop={selectedCase.crop}
+                      fallbackTitle={selectedCase.aiPrediction.condition}
                       className="w-full h-56 object-cover"
                     />
                     {selectedCase.aiPrediction.boundingBoxes?.map((bb, idx) => (

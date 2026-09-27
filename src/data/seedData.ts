@@ -1,5 +1,9 @@
 import { User, Field, CaseRecord, Hotspot, FieldVisit, AlertItem, MessageItem, KnowledgeDocument, AuditLog } from '../types';
 
+export const TOMATO_EARLY_BLIGHT_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><rect width="600" height="400" fill="%2308101d"/><path d="M 300 40 C 180 80 120 220 250 350 C 330 360 480 250 420 120 C 380 60 330 30 300 40 Z" fill="%2315803d" stroke="%2322c55e" stroke-width="3"/><path d="M 300 40 Q 300 200 250 350 M 280 120 Q 200 130 160 170 M 295 180 Q 380 190 410 220 M 270 250 Q 210 260 180 290" stroke="%234ade80" stroke-width="2" fill="none" opacity="0.8"/><circle cx="220" cy="180" r="32" fill="%23eab308" opacity="0.4"/><circle cx="220" cy="180" r="24" fill="%23854d0e"/><circle cx="220" cy="180" r="16" fill="%23ca8a04"/><circle cx="220" cy="180" r="8" fill="%23451a03"/><circle cx="360" cy="240" r="26" fill="%23eab308" opacity="0.4"/><circle cx="360" cy="240" r="18" fill="%23854d0e"/><circle cx="360" cy="240" r="10" fill="%23ca8a04"/><circle cx="360" cy="240" r="4" fill="%23451a03"/><text x="300" y="380" font-family="sans-serif" font-size="14" font-weight="bold" fill="%2338bdf8" text-anchor="middle">Tomato Early Blight (Alternaria solani)</text></svg>`;
+
+export const RICE_BLAST_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><rect width="600" height="400" fill="%2308101d"/><path d="M 100 360 C 200 280 350 120 500 40 C 440 100 260 280 140 370 Z" fill="%2316a34a" stroke="%234ade80" stroke-width="3"/><path d="M 120 365 C 220 285 360 125 490 45" stroke="%2386efac" stroke-width="2" fill="none"/><polygon points="260,220 290,200 330,220 290,240" fill="%2394a3b8" stroke="%23991b1b" stroke-width="3"/><polygon points="340,150 365,135 400,150 365,165" fill="%2394a3b8" stroke="%23991b1b" stroke-width="3"/><polygon points="190,290 215,275 245,290 215,305" fill="%2394a3b8" stroke="%23991b1b" stroke-width="3"/><text x="300" y="380" font-family="sans-serif" font-size="14" font-weight="bold" fill="%2338bdf8" text-anchor="middle">Rice / Paddy Blast (Magnaporthe oryzae)</text></svg>`;
+
 export const SEED_USERS: User[] = [
   // Farmer Demo Account
   {
@@ -299,7 +303,7 @@ export const SEED_CASES: CaseRecord[] = [
     images: [
       {
         id: 'img-case-1',
-        url: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985b?auto=format&fit=crop&w=1200&q=80',
+        url: TOMATO_EARLY_BLIGHT_SVG,
         uploadedAt: '2026-09-20T10:30:00Z',
         qualityPassed: true,
         qualityDetails: {
@@ -435,7 +439,7 @@ export const SEED_CASES: CaseRecord[] = [
     images: [
       {
         id: 'img-case-2',
-        url: 'https://images.unsplash.com/photo-1536939459926-301728717817?auto=format&fit=crop&w=1200&q=80',
+        url: RICE_BLAST_SVG,
         uploadedAt: '2026-09-18T09:00:00Z',
         qualityPassed: true,
       }

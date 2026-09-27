@@ -109,7 +109,7 @@ export const RiskIndicator: React.FC<Props> = ({
               <CheckCircle className="w-3.5 h-3.5 text-blue-400" />
               AI Disease Prob. (35%)
             </span>
-            <span className="font-bold text-white">{factors.diseaseProbabilityScore}%</span>
+            <span className="font-bold text-white">{Math.round(factors.diseaseProbabilityScore)}%</span>
           </div>
           <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-blue-500 rounded-full" style={{ width: `${factors.diseaseProbabilityScore}%` }}></div>
@@ -124,7 +124,7 @@ export const RiskIndicator: React.FC<Props> = ({
               <CloudRain className="w-3.5 h-3.5 text-cyan-400" />
               Weather Suitability (25%)
             </span>
-            <span className="font-bold text-white">{factors.weatherSuitabilityScore}%</span>
+            <span className="font-bold text-white">{Math.round(factors.weatherSuitabilityScore)}%</span>
           </div>
           <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${factors.weatherSuitabilityScore}%` }}></div>
@@ -139,7 +139,7 @@ export const RiskIndicator: React.FC<Props> = ({
               <Sprout className="w-3.5 h-3.5 text-emerald-400" />
               Crop Phenology (20%)
             </span>
-            <span className="font-bold text-white">{factors.cropSusceptibilityScore}%</span>
+            <span className="font-bold text-white">{Math.round(factors.cropSusceptibilityScore)}%</span>
           </div>
           <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${factors.cropSusceptibilityScore}%` }}></div>
@@ -154,7 +154,7 @@ export const RiskIndicator: React.FC<Props> = ({
               <MapPin className="w-3.5 h-3.5 text-purple-400" />
               Regional Pressure (20%)
             </span>
-            <span className="font-bold text-white">{factors.regionalPressureScore}%</span>
+            <span className="font-bold text-white">{Math.round(factors.regionalPressureScore)}%</span>
           </div>
           <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-purple-500 rounded-full" style={{ width: `${factors.regionalPressureScore}%` }}></div>

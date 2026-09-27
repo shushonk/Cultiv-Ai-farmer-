@@ -5,6 +5,12 @@
     "description": "Connecting Farmers, Plant Pathologists, Extension Officers, and Agricultural Authorities."
   },
   "nav": {
+    "home": "Home",
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "technology": "Technology",
+    "about": "About",
+    "portalSelect": "Access Portals",
     "dashboard": "Dashboard",
     "scan": "Scan & Diagnose",
     "fields": "My Fields",

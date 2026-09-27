@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
-import { User, Field, CaseRecord, AlertItem, MessageItem } from '../../types';
+import { User, Field, CaseRecord, AlertItem, MessageItem, RiskLevel, WeatherCondition } from '../../types';
 import { StorageService } from '../../services/storage';
 import { AIEngine } from '../../services/aiEngine';
 import { AIAssistantService, ChatMessage } from '../../services/aiAssistantService';
 import { StatusBadge, SeverityBadge, RiskBadge } from '../common/StatusBadge';
 import { RiskIndicator } from '../common/RiskIndicator';
 import { CaseTimeline } from '../common/CaseTimeline';
+import { SafeImage } from '../common/SafeImage';
 import { FarmerSettingsView } from './FarmerSettingsView';
+
+const TOMATO_EARLY_BLIGHT_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><rect width="600" height="400" fill="%2308101d"/><path d="M 300 40 C 180 80 120 220 250 350 C 330 360 480 250 420 120 C 380 60 330 30 300 40 Z" fill="%2315803d" stroke="%2322c55e" stroke-width="3"/><path d="M 300 40 Q 300 200 250 350 M 280 120 Q 200 130 160 170 M 295 180 Q 380 190 410 220 M 270 250 Q 210 260 180 290" stroke="%234ade80" stroke-width="2" fill="none" opacity="0.8"/><circle cx="220" cy="180" r="32" fill="%23eab308" opacity="0.4"/><circle cx="220" cy="180" r="24" fill="%23854d0e"/><circle cx="220" cy="180" r="16" fill="%23ca8a04"/><circle cx="220" cy="180" r="8" fill="%23451a03"/><circle cx="360" cy="240" r="26" fill="%23eab308" opacity="0.4"/><circle cx="360" cy="240" r="18" fill="%23854d0e"/><circle cx="360" cy="240" r="10" fill="%23ca8a04"/><circle cx="360" cy="240" r="4" fill="%23451a03"/><text x="300" y="380" font-family="sans-serif" font-size="14" font-weight="bold" fill="%2338bdf8" text-anchor="middle">Tomato Early Blight (Alternaria solani)</text></svg>`;
+
+const RICE_BLAST_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><rect width="600" height="400" fill="%2308101d"/><path d="M 100 360 C 200 280 350 120 500 40 C 440 100 260 280 140 370 Z" fill="%2316a34a" stroke="%234ade80" stroke-width="3"/><path d="M 120 365 C 220 285 360 125 490 45" stroke="%2386efac" stroke-width="2" fill="none"/><polygon points="260,220 290,200 330,220 290,240" fill="%2394a3b8" stroke="%23991b1b" stroke-width="3"/><polygon points="340,150 365,135 400,150 365,165" fill="%2394a3b8" stroke="%23991b1b" stroke-width="3"/><polygon points="190,290 215,275 245,290 215,305" fill="%2394a3b8" stroke="%23991b1b" stroke-width="3"/><text x="300" y="380" font-family="sans-serif" font-size="14" font-weight="bold" fill="%2338bdf8" text-anchor="middle">Rice / Paddy Blast (Magnaporthe oryzae)</text></svg>`;
+
+const CHILLI_ANTHRACNOSE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%"><rect width="600" height="400" fill="%2308101d"/><path d="M 150 200 C 180 80 320 50 450 120 C 480 250 350 350 200 320 Z" fill="%2315803d" stroke="%2322c55e" stroke-width="3"/><ellipse cx="280" cy="180" rx="35" ry="25" fill="%23f59e0b" opacity="0.4"/><ellipse cx="280" cy="180" rx="25" ry="16" fill="%2378350f"/><ellipse cx="280" cy="180" rx="12" ry="8" fill="%231c1917"/><ellipse cx="380" cy="220" rx="28" ry="18" fill="%23f59e0b" opacity="0.4"/><ellipse cx="380" cy="220" rx="18" ry="10" fill="%2378350f"/><text x="300" y="380" font-family="sans-serif" font-size="14" font-weight="bold" fill="%2338bdf8" text-anchor="middle">Chilli Anthracnose Rot (Colletotrichum capsici)</text></svg>`;
 import { useI18n } from '../../i18n';
 import {
   Sprout,
@@ -62,9 +69,7 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
 
   // Scanner States
   const [scanStep, setScanStep] = useState<'upload' | 'validating' | 'analyzing' | 'result'>('upload');
-  const [scanImage, setScanImage] = useState<string>(
-    'https://images.unsplash.com/photo-1592417817098-8f3d6910985b?auto=format&fit=crop&w=1200&q=80'
-  );
+  const [scanImage, setScanImage] = useState<string>(TOMATO_EARLY_BLIGHT_SVG);
   const [scanCrop, setScanCrop] = useState<string>(fields[0]?.crop || 'Tomato');
   const [scanStage, setScanStage] = useState<string>(fields[0]?.cropStage || 'Flowering Stage (Day 48)');
   const [scanSymptoms, setScanSymptoms] = useState('Concentric brown target rings on lower leaves with yellow halo.');
@@ -152,7 +157,7 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
     }
 
     // Get live weather metrics from server if available
-    let weather = {
+    let weather: WeatherCondition = {
       temperature: 28.4,
       humidity: 82,
       rainProbability: 55,
@@ -161,8 +166,8 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
       uvIndex: 6,
       conditionDescription: 'Humid, overcast with intermittent showers',
       forecast: [],
-      fungalRisk: 'HIGH' as const,
-      pestRisk: 'MODERATE' as const,
+      fungalRisk: 'HIGH',
+      pestRisk: 'MODERATE',
       riskExplanation: 'Leaf wetness duration > 6 hours triggers spore germination risks.',
     };
 
@@ -181,8 +186,8 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
             uvIndex: weather.uvIndex,
             conditionDescription: st.forecastSummary || weather.conditionDescription,
             forecast: [],
-            fungalRisk: (st.sporeDispersalRisk || 'HIGH') as const,
-            pestRisk: 'MODERATE' as const,
+            fungalRisk: (st.sporeDispersalRisk as RiskLevel) || 'HIGH',
+            pestRisk: 'MODERATE',
             riskExplanation: `${st.dominantThreat || 'Fungal pathogen'} risk elevated with ${st.canopyLeafWetnessHours || 6.5} hrs canopy wetness.`,
           };
         }
@@ -403,10 +408,11 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Image Preview with Bounding Box */}
               <div className="relative rounded-xl overflow-hidden bg-black border border-slate-800 flex items-center justify-center">
-                <img
+                <SafeImage
                   src={selectedCase.images[0]?.url}
                   alt="Scanned specimen"
-                  referrerPolicy="no-referrer"
+                  fallbackCrop={selectedCase.crop}
+                  fallbackTitle={selectedCase.aiPrediction.condition}
                   className="w-full h-64 object-cover"
                 />
                 {selectedCase.aiPrediction.boundingBoxes?.map((bb, idx) => (
@@ -789,21 +795,21 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
         crop: 'Tomato',
         stage: 'Flowering Stage (Day 48)',
         symptoms: 'Concentric dark target-board rings on lower leaves with yellow halos.',
-        url: 'https://images.unsplash.com/photo-1592417817098-8f3d6910985b?auto=format&fit=crop&w=1200&q=80',
+        url: TOMATO_EARLY_BLIGHT_SVG,
       },
       {
         name: 'Rice / Paddy Blast (Sample)',
         crop: 'Rice / Paddy',
         stage: 'Tillering Stage (Day 42)',
         symptoms: 'Spindle/diamond-shaped lesions with grey center and reddish-brown borders.',
-        url: 'https://images.unsplash.com/photo-1536939459926-301728717817?auto=format&fit=crop&w=1200&q=80',
+        url: RICE_BLAST_SVG,
       },
       {
         name: 'Chilli Anthracnose Rot (Sample)',
         crop: 'Chilli',
         stage: 'Fruit Setting (Day 52)',
         symptoms: 'Sunken necrotic spots on fruit and tip die-back on upper branches.',
-        url: 'https://images.unsplash.com/photo-1588879460618-9244037d45e4?auto=format&fit=crop&w=1200&q=80',
+        url: CHILLI_ANTHRACNOSE_SVG,
       },
     ];
 
@@ -916,10 +922,10 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
               {/* Current Preview */}
               <div className="pt-4 max-w-sm mx-auto">
                 <div className="rounded-xl overflow-hidden border border-slate-700 bg-black">
-                  <img
+                  <SafeImage
                     src={scanImage}
                     alt="Selected leaf preview"
-                    referrerPolicy="no-referrer"
+                    fallbackCrop={scanCrop}
                     className="w-full h-48 object-cover"
                   />
                 </div>
@@ -967,10 +973,11 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Image with Bounding Boxes */}
                 <div className="relative rounded-xl overflow-hidden bg-black border border-slate-800">
-                  <img
+                  <SafeImage
                     src={scanResult.images[0]?.url}
                     alt="Scanned specimen"
-                    referrerPolicy="no-referrer"
+                    fallbackCrop={scanResult.crop}
+                    fallbackTitle={scanResult.aiPrediction.condition}
                     className="w-full h-64 object-cover"
                   />
                   {showBoundingBoxes &&
