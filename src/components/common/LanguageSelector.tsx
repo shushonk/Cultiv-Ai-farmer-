@@ -22,6 +22,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
     { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', flag: '🇮🇳' },
     { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'mr', name: 'Marathi', nativeName: 'मराठी', flag: '🇮🇳' },
   ];
 
   const activeLang = languages.find((l) => l.code === currentLang) || languages[0];

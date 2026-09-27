@@ -1502,7 +1502,7 @@ app.patch('/api/settings/me', (req: Request, res: Response) => {
   const body = req.body || {};
 
   // Validation
-  if (body.language && !['en', 'kn', 'hi'].includes(body.language)) {
+  if (body.language && !['en', 'kn', 'hi', 'mr'].includes(body.language)) {
     return res.status(400).json({ success: false, error: 'INVALID_LANGUAGE' });
   }
   if (body.theme && !['light', 'dark', 'system'].includes(body.theme)) {
@@ -1856,7 +1856,13 @@ app.post('/api/ai/diagnose', async (req: Request, res: Response) => {
   const geminiApiKey = process.env.GEMINI_API_KEY;
   if (geminiApiKey) {
     try {
-      const ai = new GoogleGenAI({});
+      const ai = new GoogleGenAI({
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
+        },
+      });
       const prompt = `You are the CultivAI agricultural plant pathology diagnostic engine.
 Diagnose this crop specimen:
 Crop: ${crop}
@@ -1883,7 +1889,7 @@ Return ONLY a valid JSON object matching this exact schema:
 }`;
 
       const aiResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
       });
 
@@ -1893,7 +1899,7 @@ Return ONLY a valid JSON object matching this exact schema:
 
       return res.json({
         success: true,
-        source: 'GEMINI_2.5_FLASH',
+        source: 'GEMINI_3.8_FLASH',
         diagnosis: parsed,
       });
     } catch (err) {
@@ -1960,7 +1966,13 @@ app.post('/api/ai/copilot', async (req: Request, res: Response) => {
   const geminiApiKey = process.env.GEMINI_API_KEY;
   if (geminiApiKey) {
     try {
-      const ai = new GoogleGenAI({});
+      const ai = new GoogleGenAI({
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
+        },
+      });
       const prompt = `You are CultivAI, an expert AI Agricultural Agronomy and Crop Protection Assistant.
 User role: ${role}
 Target Crop: ${crop}
@@ -1974,13 +1986,13 @@ Instructions:
 4. Keep the tone encouraging, professional, and clear.`;
 
       const aiResponse = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
       });
 
       return res.json({
         success: true,
-        source: 'GEMINI_2.5_FLASH',
+        source: 'GEMINI_3.8_FLASH',
         answer: aiResponse.text,
       });
     } catch (err) {

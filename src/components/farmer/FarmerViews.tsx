@@ -116,22 +116,80 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
     await AIEngine.validateImageQuality(scanImage);
 
     setScanStep('analyzing');
-    const prediction = await AIEngine.analyzeCrop(scanCrop, scanStage, scanSymptoms);
 
-    // Get current weather
-    const weather = {
-      temperature: 27.5,
-      humidity: 84,
-      rainProbability: 65,
-      rainfallMm: 12.4,
-      windSpeedKmh: 9,
-      uvIndex: 5,
-      conditionDescription: 'Intermittent Light Rain & Humid Overcast',
+    let prediction = await AIEngine.analyzeCrop(scanCrop, scanStage, scanSymptoms);
+
+    // Call server AI diagnose endpoint
+    try {
+      const diagRes = await fetch('/api/ai/diagnose', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ crop: scanCrop, symptoms: scanSymptoms, image: scanImage }),
+      });
+      if (diagRes.ok) {
+        const diagData = await diagRes.json();
+        if (diagData && diagData.diagnosis) {
+          const d = diagData.diagnosis;
+          prediction = {
+            condition: d.condition || prediction.condition,
+            scientificName: d.scientificName || prediction.scientificName,
+            confidence: d.confidence !== undefined ? d.confidence : prediction.confidence,
+            severity: (d.severity ? d.severity.charAt(0) + d.severity.slice(1).toLowerCase() : prediction.severity) as any,
+            risk: d.overallRisk || prediction.risk,
+            type: prediction.type,
+            observedIndicators: d.recommendedActions || prediction.observedIndicators,
+            riskFactors: [
+              `High canopy humidity (>80% RH) in ${user.location?.district || 'Kolar'} region`,
+              `Favorable temperature window for pathogen sporulation`,
+            ],
+            recommendedSteps: d.recommendedActions || prediction.recommendedSteps,
+            disclaimer: 'AI-generated preliminary assessment — corroborated with microclimate sensor data.',
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('Backend diagnosis API fetch error, using client engine fallback:', err);
+    }
+
+    // Get live weather metrics from server if available
+    let weather = {
+      temperature: 28.4,
+      humidity: 82,
+      rainProbability: 55,
+      rainfallMm: 8.2,
+      windSpeedKmh: 11,
+      uvIndex: 6,
+      conditionDescription: 'Humid, overcast with intermittent showers',
       forecast: [],
       fungalRisk: 'HIGH' as const,
       pestRisk: 'MODERATE' as const,
-      riskExplanation: 'Dew duration >6.5 hours creates ideal conditions for Alternaria spore germination.',
+      riskExplanation: 'Leaf wetness duration > 6 hours triggers spore germination risks.',
     };
+
+    try {
+      const wRes = await fetch('/api/weather/microclimate');
+      if (wRes.ok) {
+        const wData = await wRes.json();
+        if (wData && wData.stations && wData.stations.length > 0) {
+          const st = wData.stations[0];
+          weather = {
+            temperature: st.temperatureC || weather.temperature,
+            humidity: st.relativeHumidityPct || weather.humidity,
+            rainProbability: weather.rainProbability,
+            rainfallMm: st.rainfallLast24hMm || weather.rainfallMm,
+            windSpeedKmh: st.windSpeedKmh || weather.windSpeedKmh,
+            uvIndex: weather.uvIndex,
+            conditionDescription: st.forecastSummary || weather.conditionDescription,
+            forecast: [],
+            fungalRisk: (st.sporeDispersalRisk || 'HIGH') as const,
+            pestRisk: 'MODERATE' as const,
+            riskExplanation: `${st.dominantThreat || 'Fungal pathogen'} risk elevated with ${st.canopyLeafWetnessHours || 6.5} hrs canopy wetness.`,
+          };
+        }
+      }
+    } catch (err) {
+      console.warn('Weather API fetch fallback:', err);
+    }
 
     const risk = AIEngine.calculateRisk(Math.round(prediction.confidence * 100), weather, scanStage, 38);
 
@@ -242,9 +300,31 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
   };
 
   // 5. Send Direct Message to Expert
-  const handleSendExpertMessage = (e: React.FormEvent) => {
+  const handleSendExpertMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!expertMsgInput.trim()) return;
+
+    const content = expertMsgInput.trim();
+    setExpertMsgInput('');
+
+    try {
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderId: user.id,
+          senderName: user.name,
+          senderRole: 'FARMER',
+          recipientId: 'user-expert-1',
+          recipientName: 'Dr. Sunita Rao, Ph.D.',
+          recipientRole: 'EXPERT',
+          caseId: cases[0]?.id,
+          content,
+        }),
+      });
+    } catch (err) {
+      console.warn('Backend message POST error:', err);
+    }
 
     StorageService.sendMessage({
       senderId: user.id,
@@ -254,10 +334,8 @@ export const FarmerViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
       recipientName: 'Dr. Sunita Rao, Ph.D.',
       recipientRole: 'EXPERT',
       caseId: cases[0]?.id,
-      content: expertMsgInput.trim(),
+      content,
     });
-
-    setExpertMsgInput('');
   };
 
   // 6. AI Assistant Chat Submission

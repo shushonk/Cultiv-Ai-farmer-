@@ -1,6 +1,6 @@
 export type UserRole = 'FARMER' | 'EXPERT' | 'OFFICER' | 'ADMIN';
 
-export type Language = 'en' | 'kn' | 'hi';
+export type Language = 'en' | 'kn' | 'hi' | 'mr';
 
 export type CaseStatus = 
   | 'New'

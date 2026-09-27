@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import enDict from './en.json';
 import knDict from './kn.json';
 import hiDict from './hi.json';
+import mrDict from './mr.json';
 import { Language } from '../types';
 
 type TranslationTree = Record<string, any>;
@@ -10,6 +11,7 @@ const DICTIONARIES: Record<Language, TranslationTree> = {
   en: enDict,
   kn: knDict,
   hi: hiDict,
+  mr: mrDict,
 };
 
 interface I18nContextValue {
@@ -27,7 +29,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('cultivai_language_v2') as Language;
-      if (stored && ['en', 'kn', 'hi'].includes(stored)) {
+      if (stored && ['en', 'kn', 'hi', 'mr'].includes(stored)) {
         return stored;
       }
     }

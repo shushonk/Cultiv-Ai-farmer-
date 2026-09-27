@@ -62,53 +62,50 @@ export const AIAssistantService = {
     field?: Field,
     cases?: CaseRecord[]
   ): Promise<ChatMessage> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const pLower = prompt.toLowerCase();
-        let responseText = '';
-        let newSuggestions: string[] = [];
+    try {
+      const res = await fetch('/api/ai/copilot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: prompt,
+          role: user.role,
+          crop: field?.crop || 'Tomato',
+          location: `${user.location?.district || 'Kolar'}, ${user.location?.state || 'Karnataka'}`,
+        }),
+      });
 
-        if (pLower.includes('yellow') || pLower.includes('blight') || pLower.includes('leaves') || pLower.includes('spot')) {
-          responseText = `### 🌿 Diagnostic Assessment: Foliar Chlorosis & Concentric Spotting\n\nBased on your crop context (**${field?.crop || 'Tomato'}**, ${field?.cropStage || 'Flowering Stage'}) and current **84% Relative Humidity**:\n\n1. **Likely Cause:** Concentric yellow-haloed lesions are characteristic of **Alternaria Early Blight**.\n2. **Immediate Action:**\n   - Prune infected lower senescent leaves (bottom 25-30 cm) and avoid leaving debris in furrows.\n   - Avoid overhead watering during afternoon hours to reduce leaf wetness duration.\n3. **Safe Bio-Protection:** Spray *Pseudomonas fluorescens* (0.5% w/v) or *Trichoderma harzianum* during early morning hours.\n4. **Expert Escalation:** If lesions spread to upper third of canopy, submit an updated scan to Dr. Sunita Rao for chemical prescription.`;
-          newSuggestions = [
-            'What is the recommended sprayer pressure and nozzle type?',
-            'How many days should I wait before uploading a follow-up picture?',
-            'What is the Pre-Harvest Interval for copper sprays?',
-          ];
-        } else if (pLower.includes('weather') || pLower.includes('forecast') || pLower.includes('rain') || pLower.includes('risk')) {
-          responseText = `### ☁️ Microclimate Weather Intelligence Risk Brief\n\n- **Current Conditions:** 27.5°C with **84% Relative Humidity** and intermittent overcast.\n- **Fungal Infection Potential:** **HIGH (Score 82/100)**. Alternaria and Phytophthora spores germinate when leaf wetness exceeds 6 hours.\n- **Pest Surge Index:** **MODERATE (Score 55/100)**. Thrips and whiteflies moderate; watch for aphid colonies on tender shoots.\n- **Actionable Advice:** Postpone any foliar chemical application until a guaranteed 4-hour dry rain-free window is available. Ensure drainage channels are clear.`;
-          newSuggestions = [
-            'Show 7-day weather trend for Kolar district',
-            'Is it safe to apply fertigation today?',
-          ];
-        } else if (pLower.includes('expert') || pLower.includes('sample') || pLower.includes('submit')) {
-          responseText = `### 👨‍🔬 Expert Verification Protocol\n\nYour case has been queued with our ICAR-certified plant pathology panel:\n\n1. **Lead Pathologist:** Dr. Sunita Rao, Ph.D. (IIHR)\n2. **Status:** Under Review (Priority High)\n3. **Average Turnaround:** Under 3 hours for critical cases.\n4. **Recommended Next Step:** Take 1 clear close-up picture of the upper leaf surface and 1 picture of the underside to assist laboratory review.`;
-          newSuggestions = [
-            'Open Case Management view',
-            'Send a direct message to Dr. Sunita Rao',
-          ];
-        } else if (pLower.includes('advisory') || pLower.includes('sms') || pLower.includes('cluster') || pLower.includes('hotspot')) {
-          responseText = `### 📢 Surveillance & Advisory Generator\n\n**Draft Alert for Kolar District (Mulbagal / Srinivaspur):**\n> *"ATTN FARMERS: Sustained morning fog and humidity >85% has triggered early blast and blight alerts across 420 acres. Inspect lower canopies immediately. Avoid excess nitrogen top-dressing. Contact extension officer for bio-control formulations."*\n\nWould you like to broadcast this alert to the 10 registered farmer contacts in this sector?`;
-          newSuggestions = [
-            'Approve and broadcast alert',
-            'View regional hotspot coordinates',
-          ];
-        } else {
-          responseText = `### 🌱 CultivAI Agronomy Insights\n\nI have analyzed your query regarding *"${prompt}"* against our agronomic knowledge base and microclimate sensor models:\n\n- **Field Focus:** ${field?.name || 'Main Parcel'} (${field?.crop || 'Tomato'})\n- **Health Metric:** ${field?.healthStatus || 'Under Surveillance'}\n- **Recommendation:** Maintain integrated pest management (IPM) practices, prioritize sanitation and bio-control agents, and maintain strict Pre-Harvest Intervals (PHI) for all interventions.\n\nLet me know if you would like me to check specific disease symptoms, soil nutrient parameters, or weather risks!`;
-          newSuggestions = [
-            'How do I calculate explainable disease risk?',
-            'What are the safe IPM cultural practices for my field?',
-          ];
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.answer) {
+          return {
+            id: `chat-resp-${Date.now()}`,
+            sender: 'assistant',
+            text: data.answer,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            suggestions: [
+              `What is the recommended sprayer pressure and nozzle type for ${field?.crop || 'Tomato'}?`,
+              `What bio-pesticide dosage is safe during early fruiting stage?`,
+              `How do I protect my crop during humid overcast weather?`,
+            ],
+          };
         }
+      }
+    } catch (err) {
+      console.warn('[CultivAI] Copilot API fetch error, using agronomic model fallback:', err);
+    }
 
-        resolve({
-          id: `chat-resp-${Date.now()}`,
-          sender: 'assistant',
-          text: responseText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          suggestions: newSuggestions,
-        });
-      }, 700);
-    });
+    // Dynamic agronomic fallback
+    const cropName = field?.crop || 'Tomato';
+    const fieldName = field?.name || 'Main Plot';
+    return {
+      id: `chat-resp-${Date.now()}`,
+      sender: 'assistant',
+      text: `### 🌱 CultivAI Agronomy Advisory\n\nRegarding your inquiry: **"${prompt}"**\n\n- **Field Location:** ${fieldName} (${cropName})\n- **Health Status:** ${field?.healthStatus || 'Active Surveillance'}\n\n**Agronomic Guidance:**\n1. Ensure adequate airflow in canopy by pruning lowest senescent leaves.\n2. Avoid late-afternoon overhead irrigation to limit canopy leaf wetness duration.\n3. For fungal or bacterial leaf spots, apply bio-agents like *Trichoderma harzianum* @ 5g/L or CIBRC approved protective sprays following recommended Pre-Harvest Intervals (PHI).\n\nConsult your local KVK extension officer for field verification.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      suggestions: [
+        'How do I calculate disease risk for my field?',
+        'What are recommended IPM cultural practices?',
+      ],
+    };
   }
 };

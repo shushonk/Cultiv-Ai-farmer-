@@ -112,7 +112,7 @@ export const ExpertViews: React.FC<Props> = ({ user, subPath, onNavigate }) => {
       action: 'Confirm Diagnosis',
       confirmedCondition: confirmedCondition || selectedCase.aiPrediction.condition,
       severity: confirmedSeverity as any,
-      confidence: 0.96,
+      confidence: selectedCase.aiPrediction.confidence || 0.89,
       advisoryText: advisoryNotes,
       managementProtocols: {
         cultural: culturalNotes.split(',').map((s) => s.trim()).filter(Boolean),
